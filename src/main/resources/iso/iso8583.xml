@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<iso8583>
+    <mti length="4"/>
+
+    <bitmap type="PRIMARY"/>
+
+    <fields>
+        <field id="2" type="LLVAR" maxLength="19" dataType="NUMERIC"/>
+        <field id="3" type="FIXED" length="6" dataType="NUMERIC"/>
+        <field id="4" type="FIXED" length="12" dataType="NUMERIC"/>
+        <field id="6" type="FIXED" length="12" dataType="NUMERIC"/>
+        <field id="7" type="FIXED" length="10" dataType="NUMERIC"/>
+        <field id="11" type="FIXED" length="6" dataType="NUMERIC"/>
+    </fields>
+</iso8583>
