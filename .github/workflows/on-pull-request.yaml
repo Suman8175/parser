@@ -1,0 +1,66 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+jobs:
+  pr-validation:
+    name: PR Convention, Template & Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate PR Title (Conventional Commits)
+        run: |
+          PR_TITLE=$(jq -r .pull_request.title < "$GITHUB_EVENT_PATH")
+
+          echo "PR Title: $PR_TITLE"
+
+          if ! echo "$PR_TITLE" | grep -qE "^(feat|fix|chore|docs|style|refactor|test|build|ci|perf|revert|release)(!:)? "; then
+            echo "ERROR: PR title must follow Conventional Commit format."
+            echo "Example: feat: add user login"
+            exit 1
+          fi
+
+      - name: Validate PR Description (Template Used)
+        run: |
+          PR_BODY=$(jq -r .pull_request.body < "$GITHUB_EVENT_PATH")
+
+          if [ -z "$PR_BODY" ] || [ "$PR_BODY" = "null" ]; then
+            echo "ERROR: PR description is empty. Please use the PR template."
+            exit 1
+          fi
+
+          required_sections=(
+            "Issue Link"
+            "What Modifications does this PR contains"
+            "What is the Purpose of this Change"
+            "Tests"
+            "Type of change"
+          )
+
+          for section in "${required_sections[@]}"; do
+            if ! echo "$PR_BODY" | grep -qi "$section"; then
+              echo "ERROR: Missing section in PR description: $section"
+              exit 1
+            fi
+          done
+
+          echo "PR description follows the template."
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build and Run Tests
+        run: mvn clean verify
