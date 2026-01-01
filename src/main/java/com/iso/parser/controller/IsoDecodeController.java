@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @RestController
@@ -25,24 +24,18 @@ public class IsoDecodeController {
     }
 
     @PostMapping("/decode")
-    public Map<Integer, String> decode(@RequestBody IsoDecodeRequest request) throws DecoderException {
-
+    public Map<Integer, Object> decode(@RequestBody IsoDecodeRequest request) throws DecoderException {
         String isoHex = request.getIsoMessage().trim();
-
-        // Convert ASCII-HEX (e.g., "30313030") to actual bytes (e.g., [0x30, 0x31, 0x30, 0x30])
-        // This is necessary because IsoMessageDecoder uses a ByteBuffer
+        long startTimeNs = System.nanoTime();
         byte[] isoBytes = Hex.decodeHex(isoHex);
-        long startTimeMs = System.currentTimeMillis();
-        // Call your decoder which processes the MTI, Bitmap, and Fields
-        Map<Integer, String> decode = decoder.decode(isoBytes);
-        long endTimeMs = System.currentTimeMillis();
-        long durationMs = endTimeMs - startTimeMs;
+
+        // Returns the structured map
+        Map<Integer, Object> decode = decoder.decode(isoBytes);
+        long durationMs = (System.nanoTime() - startTimeNs) / 1_000_000;
 
         log.info("ISO decode completed in {} ms", durationMs);
+
         return decode;
     }
-
-
-
 }
 

@@ -6,10 +6,21 @@
 
     <fields>
         <field id="2" type="LLVAR" maxLength="19" dataType="NUMERIC"/>
-        <field id="3" type="FIXED" length="6" dataType="NUMERIC"/>
+        <field id="3" type="COMPOSITE" length="6" dataType="NUMERIC" transformer="PROCESSING_CODE">
+            <field id="1" length="2" name="transaction_type"/>
+            <field id="2" length="2" name="from_account_type"/>
+            <field id="3" length="2" name="to_account_type"/>
+        </field>
         <field id="4" type="FIXED" length="12" dataType="NUMERIC"/>
         <field id="6" type="FIXED" length="12" dataType="NUMERIC"/>
-        <field id="7" type="FIXED" length="10" dataType="NUMERIC"/>
+        <field id="7" type="COMPOSITE" length="10" transformer="DATE_TIME_FORMAT">
+            <field id="1" length="4" name="date_mmdd"/>
+            <field id="2" length="6" name="time_hhmmss"/>
+        </field>
+        <field id="10" type="COMPOSITE" length="8" transformer="CURRENCY_CONVERSION">
+            <field id="1" length="1"/>
+            <field id="2" length="7"/>
+        </field>
         <field id="11" type="FIXED" length="6" dataType="NUMERIC"/>
     </fields>
 </iso8583>
